@@ -1,0 +1,9 @@
+[package]
+name = "rust_kzg"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+c-kzg = { git = "https://github.com/jacobkaufmann/c-kzg-4844", branch = "jtraglia-das" }
