@@ -4,12 +4,7 @@ use std::error::Error;
 High Level Repository Notes:
 -------------------------------------------------
 TODO:
-    1. Create a field trait.
-        - Addition
-        - Subtraction
-        - Multiplication
-        - Division
-    2. Create a finite field that implements this field trait.
+    1. Create a prime field that implements this field trait.
     2. Create THE field over which our curve is defined.
     3. Create the BLS12-381 G1 point type.
         - Express all functionality the point type needs.
@@ -18,18 +13,20 @@ TODO:
 
 // A generalized version of "what a number is"
 pub trait Field {
-    fn add(&self, other: &FiniteFieldElement) -> FiniteFieldElement;
-    fn sub(&self, other: &FiniteFieldElement) -> FiniteFieldElement;
-    fn mul(&self, other: &FiniteFieldElement) -> FiniteFieldElement;
-    fn div(&self, other: &FiniteFieldElement) -> FiniteFieldElement;
+    fn add(&self, other: &PrimeFieldElement) -> PrimeFieldElement;
+    fn sub(&self, other: &PrimeFieldElement) -> PrimeFieldElement;
+    fn mul(&self, other: &PrimeFieldElement) -> PrimeFieldElement;
+    fn div(&self, other: &PrimeFieldElement) -> PrimeFieldElement;
 }
 
 // Create field elements via a finite_field.from()
 // Note: This is a Finite Field Element!
+//
+// Should i call this a "prime field element"?
 #[derive(Debug, PartialEq, Clone)]
-pub struct FiniteFieldElement {
+pub struct PrimeFieldElement {
     int: u32,
-    field: FiniteField,
+    field: PrimeField,
 }
 
 // Big Question:
@@ -37,32 +34,34 @@ pub struct FiniteFieldElement {
 
 // Note: A prime field is a type of finite field.
 // We need a prime field for our elliptic curve equation.
+//
+// TODO: Our modulus MUST be a prime number.
 #[derive(Debug, PartialEq, Clone)]
-struct FiniteField {
+struct PrimeField {
     modulus: u32,
     generator: u32,
     // TODO: Add a "zero?"
 }
 
-impl FiniteField {
+impl PrimeField {
     fn new(modulus: u32, generator: u32) -> Self {
         Self { modulus, generator }
     }
 
-    fn from(&self, int: u32) -> Result<FiniteFieldElement, Box<dyn Error>> {
+    fn from(&self, int: u32) -> Result<PrimeFieldElement, Box<dyn Error>> {
         // Verifies the *integer* is within the field.
         // Type conversion needed for division
         let out = f64::from(int) / f64::from(self.generator);
         assert_eq!(out, out.round());
 
-        Ok(FiniteFieldElement {
+        Ok(PrimeFieldElement {
             int: int % &self.modulus,
             field: self.clone(),
         })
     }
 }
 
-impl Field for FiniteFieldElement {
+impl Field for PrimeFieldElement {
     fn add(&self, b: &Self) -> Self {
         assert_eq!(&self.field, &b.field);
 
@@ -122,7 +121,7 @@ mod tests {
     // ------------------------------------------------------
     #[test]
     fn add_elements() {
-        let fq = FiniteField::new(17, 1);
+        let fq = PrimeField::new(17, 1);
         let a = fq.from(9).expect("hard coded values in test are valid");
         let b = fq.from(10).expect("hard coded values in test are valid");
 
@@ -136,7 +135,7 @@ mod tests {
 
     #[test]
     fn sub_elements() {
-        let fq = FiniteField::new(17, 1);
+        let fq = PrimeField::new(17, 1);
         let a = fq.from(9).expect("hard coded values in test are valid");
         let b = fq.from(10).expect("hard coded values in test are valid");
         let res = a.sub(&b);
@@ -149,7 +148,7 @@ mod tests {
 
     #[test]
     fn mul_elements() {
-        let fq = FiniteField::new(17, 1);
+        let fq = PrimeField::new(17, 1);
         let a = fq.from(9).expect("hard coded values in test are valid");
         let b = fq.from(10).expect("hard coded values in test are valid");
 
@@ -161,7 +160,7 @@ mod tests {
 
     #[test]
     fn div_elements() {
-        let fq = FiniteField::new(7, 1);
+        let fq = PrimeField::new(7, 1);
         let a = fq.from(3).expect("hard coded values in test are valid");
         let b = fq.from(2).expect("hard coded values in test are valid");
 

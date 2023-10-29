@@ -1,8 +1,9 @@
-/*
+use crate::fields::PrimeFieldElement;
 
 // Elliptic Curve Points
 // ------------------------------------------------------------------------------------------------------------------------------------------
 // BLS12-381 curve info:
+//   q = p^k    :    We say q is a "prime power"
 // * Base field: q = 4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559787
 //       - The base field is the finite field over which our curve is defined.
 // * Scalar field: r =
@@ -17,12 +18,12 @@ const BLS_MODULUS: usize = 65537;
 
 // TODO: Affine representation of G1 elliptic curve point
 struct BlsPoint {
-    x: usize,
-    y: usize,
+    x: PrimeFieldElement,
+    y: PrimeFieldElement,
 }
 
 impl BlsPoint {
-    fn new(x: &usize, y: &usize) -> Self {
+    fn new(x: &PrimeFieldElement, y: &PrimeFieldElement) -> Self {
         unimplemented!()
     }
     fn add(p: &BlsPoint, q: &BlsPoint) -> BlsPoint {
@@ -32,4 +33,3 @@ impl BlsPoint {
         unimplemented!()
     }
 }
-*/
