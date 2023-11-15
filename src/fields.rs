@@ -86,53 +86,6 @@ impl Field for FieldElement {
     }
 }
 
-// TODO:
-/*
-pub trait PrimeField: Field {
-    fn from() {
-        is_prime();
-    }
-    fn modulus() {}
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct PrimeFieldElement {
-    int: u32,
-    modulus: u32,
-}
-
-// TODO:
-impl PrimeField for PrimeFieldElement {}
- */
-
-// ------------------------------------------------------------------------
-/*
-
-//       TODO: Our modulus MUST be a prime number.
-#[derive(Debug, PartialEq, Clone)]
-struct PrimeField {
-    // TODO: Create a prime number type.
-    modulus: u32,
-    // TODO: Add a "zero?"
-}
-
-impl PrimeField {
-    fn new(modulus: u32) -> Self {
-        Self { modulus }
-    }
-
-    fn from(&self, int: u32) -> Result<PrimeFieldElement, Box<dyn Error>> {
-        assert_eq!(out, out.round());
-
-        Ok(PrimeFieldElement {
-            int: int % &self.modulus,
-            field: self.clone(),
-        })
-    }
-}
- */
-// ------------------------------------------------------------------------
-
 #[cfg(test)]
 mod tests {
     use super::*;
