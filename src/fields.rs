@@ -1,14 +1,3 @@
-/*
-High Level Repository Notes:
--------------------------------------------------
-TODO:
-    1. Create a prime field that implements the field trait.
-    2. Create THE field over which our curve is defined.
-    3. Create the BLS12-381 G1 point type.
-        - Express all functionality the point type needs.
--------------------------------------------------
- */
-
 pub trait Field {
     fn add(&self, other: &Self) -> Self;
     fn sub(&self, other: &Self) -> Self;
@@ -16,23 +5,40 @@ pub trait Field {
     fn div(&self, other: &Self) -> Self;
 }
 
-// A field element can be thought of as a generalized version of "what a number is".
 #[derive(Debug, PartialEq)]
-pub struct FieldElement {
+pub struct PrimeFieldElement {
     element: u32,
     modulus: u32,
 }
 
-impl FieldElement {
-    fn from(element: u32, modulus: u32) -> FieldElement {
-        Self {
+impl PrimeFieldElement {
+    fn build(element: u32, modulus: u32) -> Result<PrimeFieldElement, &'static str> {
+        if !is_prime(modulus) {
+            return Err("Modulus isn't prime");
+        }
+
+        Ok(Self {
             element: element % modulus,
             modulus,
-        }
+        })
     }
 }
 
-impl Field for FieldElement {
+fn is_prime(x: u32) -> bool {
+    if x <= 1 {
+        return false;
+    }
+
+    // TODO: Is this safe?  Are overflows possible here?
+    for i in 2..=(x as f64).sqrt() as u32 {
+        if x % i == 0 {
+            return false;
+        }
+    }
+    true
+}
+
+impl Field for PrimeFieldElement {
     fn add(&self, b: &Self) -> Self {
         assert_eq!(&self.modulus, &b.modulus);
 
@@ -93,8 +99,11 @@ mod tests {
     #[test]
     fn modulo() {
         let modulus = 17;
-        let res = FieldElement::from(26, modulus);
-        assert_eq!(res, FieldElement::from(9, modulus))
+        let res = PrimeFieldElement::build(26, modulus).expect("Modulus should be prime in test");
+        assert_eq!(
+            res,
+            PrimeFieldElement::build(9, modulus).expect("Modulus should be prime in test")
+        )
     }
 
     // Field modulo arithmetic tests
@@ -102,40 +111,52 @@ mod tests {
     #[test]
     fn add() {
         let modulus = 17;
-        let a = FieldElement::from(9, modulus);
-        let b = FieldElement::from(10, modulus);
+        let a = PrimeFieldElement::build(9, modulus).expect("Modulus should be prime in test");
+        let b = PrimeFieldElement::build(10, modulus).expect("Modulus should be prime in test");
 
         let res = a.add(&b);
-        assert_eq!(res, FieldElement::from(2, modulus));
+        assert_eq!(
+            res,
+            PrimeFieldElement::build(2, modulus).expect("Modulus should be prime in test")
+        );
     }
 
     #[test]
     fn sub() {
         let modulus = 17;
-        let a = FieldElement::from(9, modulus);
-        let b = FieldElement::from(10, modulus);
+        let a = PrimeFieldElement::build(9, modulus).expect("Modulus should be prime in test");
+        let b = PrimeFieldElement::build(10, modulus).expect("Modulus should be prime in test");
 
         let res = a.sub(&b);
-        assert_eq!(res, FieldElement::from(16, modulus));
+        assert_eq!(
+            res,
+            PrimeFieldElement::build(16, modulus).expect("Modulus should be prime in test")
+        );
     }
 
     #[test]
     fn mul() {
         let modulus = 17;
-        let a = FieldElement::from(9, modulus);
-        let b = FieldElement::from(10, modulus);
+        let a = PrimeFieldElement::build(9, modulus).expect("Modulus should be prime in test");
+        let b = PrimeFieldElement::build(10, modulus).expect("Modulus should be prime in test");
 
         let res = a.mul(&b);
-        assert_eq!(res, FieldElement::from(5, modulus));
+        assert_eq!(
+            res,
+            PrimeFieldElement::build(5, modulus).expect("Modulus should be prime in test")
+        );
     }
 
     #[test]
     fn div() {
         let modulus = 7;
-        let a = FieldElement::from(3, modulus);
-        let b = FieldElement::from(2, modulus);
+        let a = PrimeFieldElement::build(3, modulus).expect("Modulus should be prime in test");
+        let b = PrimeFieldElement::build(2, modulus).expect("Modulus should be prime in test");
 
         let res = a.div(&b);
-        assert_eq!(res, FieldElement::from(5, modulus));
+        assert_eq!(
+            res,
+            PrimeFieldElement::build(5, modulus).expect("Modulus should be prime in test")
+        );
     }
 }
